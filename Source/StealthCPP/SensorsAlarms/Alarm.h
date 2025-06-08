@@ -18,6 +18,11 @@ public:
 	// Sets default values for this actor's properties
 	AAlarm();
 
+	UFUNCTION()
+	void StartAlarm();
+	UFUNCTION()
+	void StopAlarm();
+
 protected:
 	virtual void BeginPlay() override;
 	
@@ -40,10 +45,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Alarm")
 	TObjectPtr<USoundBase> AlarmSoundToPlay;
 private:
-	UFUNCTION()
-	void StartAlarm();
-	UFUNCTION()
-	void StopAlarm();
+
 
 	UPROPERTY()
 	TObjectPtr<UAudioComponent> SoundBeingPlayed;

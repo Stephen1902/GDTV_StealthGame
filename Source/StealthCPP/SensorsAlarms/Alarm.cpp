@@ -40,7 +40,7 @@ void AAlarm::BeginPlay()
 {
 	Super::BeginPlay();
 
-	GetWorldTimerManager().SetTimer(AlarmTimerHandle, this, &AAlarm::StartAlarm, 3.0f, false, 3.0f);
+	//GetWorldTimerManager().SetTimer(AlarmTimerHandle, this, &AAlarm::StartAlarm, 3.0f, false, 3.0f);
 }
 
 void AAlarm::StartAlarm()
@@ -53,7 +53,7 @@ void AAlarm::StartAlarm()
 		RotatingMovementComp->RotationRate = FRotator(0.f, 180.f, 0.f);
 		SpotLightOne->SetVisibility(true);
 		SpotLightTwo->SetVisibility(true);
-		GetWorldTimerManager().SetTimer(AlarmTimerHandle, this, &AAlarm::StopAlarm, 3.0f, false, 3.0f);
+	//	GetWorldTimerManager().SetTimer(AlarmTimerHandle, this, &AAlarm::StopAlarm, 3.0f, false, 3.0f);
 	}
 }
 
@@ -69,6 +69,6 @@ void AAlarm::StopAlarm()
 		SpotLightOne->SetVisibility(false);
 		SpotLightTwo->SetVisibility(false);
 		
-		GetWorldTimerManager().SetTimer(AlarmTimerHandle, this, &AAlarm::StartAlarm, 3.0f, false, 3.0f);
+	//	GetWorldTimerManager().SetTimer(AlarmTimerHandle, this, &AAlarm::StartAlarm, 3.0f, false, 3.0f);
 	}
 }

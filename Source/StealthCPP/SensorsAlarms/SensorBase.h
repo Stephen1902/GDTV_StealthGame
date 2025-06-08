@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/TimelineComponent.h"
 #include "GameFramework/Actor.h"
 #include "SensorBase.generated.h"
 
@@ -16,13 +17,39 @@ public:
 	ASensorBase();
 
 protected:
+	// Called at Game Start
+	virtual void BeginPlay() override;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sensors")
 	TObjectPtr<USceneComponent> RootComp;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sensors")
 	TObjectPtr<class UPointLightComponent> PointLightComp;
 
+	// The sound to play when this sensor has been triggered
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sensors")
+	TObjectPtr<USoundBase> SoundOnTriggered; 
 	
+	// The attenuation settings for the sound being triggered
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sensors")
+	TObjectPtr<USoundAttenuation> SoundAttenuation; 
 public:	
 	virtual void DetectPlayer(AActor* ActorDetected);
+
+private:
+	bool bHasBeenTriggered;
+
+	UPROPERTY()
+	UTimelineComponent* FlashTimeline;
+ 
+	UPROPERTY()
+	UCurveFloat* FloatCurve;
+ 
+	FOnTimelineFloat InterpFunction{};
+ 
+	UFUNCTION()
+	void TimelineFloatReturn(float Val);
+
+	UPROPERTY()
+	FTimerHandle FakeTimerHandle;
 };
