@@ -32,7 +32,10 @@ protected:
 	
 	// The attenuation settings for the sound being triggered
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sensors")
-	TObjectPtr<USoundAttenuation> SoundAttenuation; 
+	TObjectPtr<USoundAttenuation> SoundAttenuation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sensors")
+	UCurveFloat* FloatCurve;
 public:	
 	virtual void DetectPlayer(AActor* ActorDetected);
 
@@ -41,12 +44,9 @@ private:
 
 	UPROPERTY()
 	UTimelineComponent* FlashTimeline;
- 
-	UPROPERTY()
-	UCurveFloat* FloatCurve;
- 
+
 	FOnTimelineFloat InterpFunction{};
- 
+	
 	UFUNCTION()
 	void TimelineFloatReturn(float Val);
 

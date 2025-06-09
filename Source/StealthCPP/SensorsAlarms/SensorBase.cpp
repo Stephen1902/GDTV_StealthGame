@@ -17,7 +17,7 @@ ASensorBase::ASensorBase()
 
 	PointLightComp = CreateDefaultSubobject<UPointLightComponent>("Point Light Comp");
 	PointLightComp->SetupAttachment(RootComp);
-	PointLightComp->Intensity = 100000.f;
+	PointLightComp->Intensity = 0.f;
 	PointLightComp->SetLightColor(FColor::Red);
 
 	bHasBeenTriggered = false;
@@ -28,13 +28,13 @@ ASensorBase::ASensorBase()
 		SoundAttenuation = SoundAtt.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UCurveFloat> FoundCurve(TEXT("/Game/Alarms_Sensors/Sensors/BP_SensorCurve"));
+	static ConstructorHelpers::FObjectFinder<UCurveFloat> FoundCurve(TEXT("/Game/Alarms_Sensors/Sensors/CF_SensorCurve"));
 	if (FoundCurve.Succeeded())
 	{
 		FloatCurve = FoundCurve.Object;
 
 		FlashTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("Timeline Comp"));
-	
+				
 		//Bind the Callback function for the float return value
 		InterpFunction.BindUFunction(this, FName{ TEXT("TimelineFloatReturn") });
 	}
@@ -49,6 +49,7 @@ void ASensorBase::BeginPlay()
 	{
 		//Add the float curve to the timeline and connect it to the interp function
 		FlashTimeline->AddInterpFloat(FloatCurve, InterpFunction, FName{ TEXT("Flash Timeline") });
+		FlashTimeline->SetLooping(true);
 	}
 }
 
@@ -72,6 +73,7 @@ void ASensorBase::DetectPlayer(AActor* ActorDetected)
 
 		if (FlashTimeline)
 		{
+			
 			FlashTimeline->Play();
 		}
 	}
@@ -79,7 +81,5 @@ void ASensorBase::DetectPlayer(AActor* ActorDetected)
 
 void ASensorBase::TimelineFloatReturn(float Val)
 {
-	const FString ValAsString = FString::SanitizeFloat(Val);
-	GEngine->AddOnScreenDebugMessage(0, 0.f, FColor::Green, *ValAsString);
+	PointLightComp->SetIntensity(Val * 100000.f);
 }
-
