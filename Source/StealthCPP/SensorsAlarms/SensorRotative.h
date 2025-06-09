@@ -17,6 +17,9 @@ class STEALTHCPP_API ASensorRotative : public ASensorBase
 	ASensorRotative();
 protected:
 	virtual void BeginPlay() override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sensors")
+	TObjectPtr<UStaticMeshComponent> WallMesh;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sensors")
 	TObjectPtr<UStaticMeshComponent> HeadMesh;

@@ -7,6 +7,9 @@
 
 ASensorRotative::ASensorRotative()
 {
+	WallMesh = CreateDefaultSubobject<UStaticMeshComponent>("Wall Mesh Comp");
+	WallMesh->SetupAttachment(RootComp);
+		
 	HeadMesh = CreateDefaultSubobject<UStaticMeshComponent>("Head Mesh Comp");
 	HeadMesh->SetupAttachment(RootComp);
 
@@ -20,8 +23,8 @@ ASensorRotative::ASensorRotative()
 	DetectionMeshComp->SetCollisionResponseToAllChannels(ECR_Overlap);
 
 	bTimelineForward = true;
-	ForwardRotation = FRotator(0.f, 90.f, 0.f);
-	BackwardRotation = FRotator(0.f, -90.f, 0.f);
+	ForwardRotation = FRotator(0.f, 180.f, 0.f);
+	BackwardRotation = FRotator(0.f, 0.f, 0.f);
 
 	static ConstructorHelpers::FObjectFinder<UCurveFloat> FoundCurve(TEXT("/Game/Alarms_Sensors/Sensors/CF_RotatingSensor"));
 	if (FoundCurve.Succeeded())
