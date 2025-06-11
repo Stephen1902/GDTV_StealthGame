@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Framework/InteractInterface.h"
 #include "GameFramework/Character.h"
 #include "StealthCharacter.generated.h"
 
@@ -13,7 +14,7 @@ class UInputAction;
 struct FInputActionValue;
 
 UCLASS()
-class STEALTHCPP_API AStealthCharacter : public ACharacter
+class STEALTHCPP_API AStealthCharacter : public ACharacter, public IInteractInterface
 {
 	GENERATED_BODY()
 
@@ -52,7 +53,10 @@ protected:
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookAction;
-	
+
+	/** Interact Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* InteractAction;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -60,4 +64,7 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+private:
+	UFUNCTION()
+	void TryToInteract();
 };

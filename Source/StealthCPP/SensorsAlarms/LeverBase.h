@@ -3,11 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Framework/InteractInterface.h"
 #include "GameFramework/Actor.h"
 #include "LeverBase.generated.h"
 
 UCLASS()
-class STEALTHCPP_API ALeverBase : public AActor
+class STEALTHCPP_API ALeverBase : public AActor, public IInteractInterface
 {
 	GENERATED_BODY()
 	
@@ -30,11 +31,21 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Levers")
 	TObjectPtr<USkeletalMeshComponent> SkeletalMeshComp;
+
+	// The sound to be played when the player interacts with this lever
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Levers")
+	TObjectPtr<USoundBase> SoundOnInteract;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	void SwitchLever();
 private:
 	UPROPERTY()
 	TObjectPtr<UAnimSequence> AnimSequence;
+
+	UPROPERTY()
+	TObjectPtr<USoundAttenuation> SoundAttenuation;
+	
+	virtual void Interact_Implementation() override;
 };

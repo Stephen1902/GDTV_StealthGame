@@ -123,10 +123,33 @@ void AStealthCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AStealthCharacter::Look);
+
+		// Interact
+		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &AStealthCharacter::TryToInteract);
 	}
 	else
 	{
 		UE_LOG(LogTemp, Error, TEXT("'%s' Failed to find an Enhanced Input component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
+	}
+}
+
+void AStealthCharacter::TryToInteract()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Trying To Interact"));
+	TArray<AActor*> OverlappingActors;
+	GetOverlappingActors(OverlappingActors);
+
+	UE_LOG(LogTemp, Warning, TEXT("Found %i overlapping"), OverlappingActors.Num());
+	if (OverlappingActors.Num() > 0)
+	{
+		
+		for (AActor* It : OverlappingActors)
+		{
+			if (It->Implements<UInteractInterface>())
+			{
+				 IInteractInterface::Execute_Interact(It);
+			}
+		}
 	}
 }
 
