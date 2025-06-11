@@ -9,11 +9,13 @@ ASensorBar::ASensorBar()
 {
 	CollisionComp = CreateDefaultSubobject<UBoxComponent>("Collision Comp");
 	CollisionComp->SetupAttachment(RootComp);
-	CollisionComp->SetBoxExtent(FVector(5.0f, 150.f, 30.f));
+	CollisionComp->SetBoxExtent(FVector(5.0f, 150.f, 130.f));
 
 	MeshComp=CreateDefaultSubobject<UStaticMeshComponent>("Mesh Comp");
 	MeshComp->SetupAttachment(RootComp);
 	MeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	MeshComp->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
+	MeshComp->SetRelativeLocation(FVector(0.f, 0.f, -25.f));
 	
 }
 
