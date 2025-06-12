@@ -10,6 +10,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
 AStealthCharacter::AStealthCharacter()
@@ -39,7 +40,20 @@ AStealthCharacter::AStealthCharacter()
 		MovementComponent->bUseControllerDesiredRotation = false;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UCurveFloat> FoundCurve(TEXT("/Game/Player/TL_CameraMovement"));
+	if (FoundCurve.Succeeded())
+	{
+		FloatCurve = FoundCurve.Object;
+
+		CameraTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("Timeline Comp"));
+				
+		//Bind the Callback function for the float return value
+		CameraInterpFunction.BindUFunction(this, FName{ TEXT("TimelineFloatReturn") });
+	}
+	
 	Tags.Add(FName("Player"));
+
+	bIsCrouching = false;
 }
 
 void AStealthCharacter::Move(const FInputActionValue& Value)
@@ -88,6 +102,15 @@ void AStealthCharacter::BeginPlay()
 		CameraManager->ViewPitchMax = 0.f;
 		CameraManager->ViewPitchMin = -60.f;
 	}
+
+	StandardCameraPos = SpringArmComp->TargetArmLength;
+	CrouchCameraPos = StandardCameraPos + 150.f;
+
+	if (CameraTimeline)
+	{
+		CameraTimeline->AddInterpFloat(FloatCurve, CameraInterpFunction, FName{ TEXT("Camera Timeline")});
+		CameraTimeline->SetLooping(false);
+	}
 }
 
 // Called every frame
@@ -126,6 +149,9 @@ void AStealthCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 		// Interact
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &AStealthCharacter::TryToInteract);
+
+		// Crouch
+		EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Started, this, &AStealthCharacter::ToggleCrouch);
 	}
 	else
 	{
@@ -151,5 +177,49 @@ void AStealthCharacter::TryToInteract()
 			}
 		}
 	}
+}
+
+void AStealthCharacter::ToggleCrouch()
+{
+	UE_LOG(LogTemp, Warning, TEXT("ToggleCrouch"));
+	if (!bIsCrouching)
+	{
+		bIsCrouching = true;
+		if (UCharacterMovementComponent* CharMovement = GetCharacterMovement())
+		{
+			CharMovement->MaxWalkSpeed = 350.f;
+		}
+
+		if (CameraTimeline)
+		{
+			CameraTimeline->PlayFromStart();
+		}
+		else
+		{
+			SpringArmComp->TargetArmLength = CrouchCameraPos;
+		}
+	}
+	else
+	{
+		bIsCrouching = false;
+		if (UCharacterMovementComponent* CharMovement = GetCharacterMovement())
+		{
+			CharMovement->MaxWalkSpeed = 600.f;
+		}
+
+		if (CameraTimeline)
+		{
+			CameraTimeline->ReverseFromEnd();
+		}
+		else
+		{
+			SpringArmComp->TargetArmLength = StandardCameraPos;
+		}
+	}
+}
+
+void AStealthCharacter::TimelineFloatReturn(float Val)
+{
+	SpringArmComp->TargetArmLength = UKismetMathLibrary::Lerp(StandardCameraPos, CrouchCameraPos, Val);
 }
 

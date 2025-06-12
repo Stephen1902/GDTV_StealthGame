@@ -52,7 +52,5 @@ private:
 	UFUNCTION()
 	void TimelineFloatReturn(float Val);
 
-	UPROPERTY()
-	FTimerHandle FakeTimerHandle;
 	
 };

@@ -39,21 +39,17 @@ AAlarm::AAlarm()
 void AAlarm::BeginPlay()
 {
 	Super::BeginPlay();
-
-	//GetWorldTimerManager().SetTimer(AlarmTimerHandle, this, &AAlarm::StartAlarm, 3.0f, false, 3.0f);
 }
 
 void AAlarm::StartAlarm()
 {
 	if (!bIsAlarmSounding && AlarmSoundToPlay && RotatingMovementComp)
 	{
-		GetWorldTimerManager().ClearTimer(AlarmTimerHandle);
 		SoundBeingPlayed = UGameplayStatics::SpawnSoundAtLocation(GetWorld(), AlarmSoundToPlay, GetActorLocation());
 		bIsAlarmSounding = true;
 		RotatingMovementComp->RotationRate = FRotator(0.f, 180.f, 0.f);
 		SpotLightOne->SetVisibility(true);
 		SpotLightTwo->SetVisibility(true);
-	//	GetWorldTimerManager().SetTimer(AlarmTimerHandle, this, &AAlarm::StopAlarm, 3.0f, false, 3.0f);
 	}
 }
 
@@ -61,14 +57,10 @@ void AAlarm::StopAlarm()
 {
 	if (bIsAlarmSounding && RotatingMovementComp)
 	{
-		GetWorldTimerManager().ClearTimer(AlarmTimerHandle);
-		
 		SoundBeingPlayed->Stop();
 		bIsAlarmSounding = false;
 		RotatingMovementComp->RotationRate = FRotator(0.f, 0.f, 0.f);
 		SpotLightOne->SetVisibility(false);
 		SpotLightTwo->SetVisibility(false);
-		
-	//	GetWorldTimerManager().SetTimer(AlarmTimerHandle, this, &AAlarm::StartAlarm, 3.0f, false, 3.0f);
 	}
 }

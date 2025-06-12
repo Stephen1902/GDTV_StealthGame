@@ -51,7 +51,4 @@ private:
 	TObjectPtr<UAudioComponent> SoundBeingPlayed;
 	
 	bool bIsAlarmSounding;
-
-	/** To be removed */
-	FTimerHandle AlarmTimerHandle;
 };

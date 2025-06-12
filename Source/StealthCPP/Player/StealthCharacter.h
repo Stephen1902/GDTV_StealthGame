@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Framework/InteractInterface.h"
 #include "GameFramework/Character.h"
+#include "Components/TimelineComponent.h"
 #include "StealthCharacter.generated.h"
 
 class USpringArmComponent;
@@ -22,6 +23,9 @@ public:
 	// Sets default values for this character's properties
 	AStealthCharacter();
 
+	UFUNCTION(BlueprintCallable, Category = "Player")
+	bool GetPlayerCrouching() const	{ return bIsCrouching; }
+
 protected:
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
@@ -37,6 +41,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player")
 	TObjectPtr<UCameraComponent> CameraComp;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sensors")
+	UCurveFloat* FloatCurve;
 
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
@@ -57,6 +64,10 @@ protected:
 	/** Interact Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* InteractAction;
+
+	/** Crouch Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* CrouchAction;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -67,4 +78,20 @@ public:
 private:
 	UFUNCTION()
 	void TryToInteract();
+
+	bool bIsCrouching;
+	UFUNCTION()
+	void ToggleCrouch();
+
+	float StandardCameraPos;
+	float CrouchCameraPos;
+	
+	UPROPERTY()
+	UTimelineComponent* CameraTimeline;
+
+	FOnTimelineFloat CameraInterpFunction{};
+	
+	UFUNCTION()
+	void TimelineFloatReturn(float Val);
+
 };
