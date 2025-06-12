@@ -30,3 +30,21 @@ void ASensorBar::OnBoxOverlapped(UPrimitiveComponent* OverlappedComponent, AActo
 {
 	DetectPlayer(OtherActor);
 }
+
+void ASensorBar::Interact_Implementation()
+{
+	IInteractInterface::Interact_Implementation();
+
+	if (bIsActive)
+	{
+		bIsActive = false;
+		MeshComp->SetVisibility(false);
+		CollisionComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+	else
+	{
+		bIsActive = true;
+		MeshComp->SetVisibility(true);
+		CollisionComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	}
+}

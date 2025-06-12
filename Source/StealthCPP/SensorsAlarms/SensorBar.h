@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Framework/InteractInterface.h"
 #include "SensorsAlarms/SensorBase.h"
 #include "SensorBar.generated.h"
 
@@ -10,7 +11,7 @@
  * 
  */
 UCLASS()
-class STEALTHCPP_API ASensorBar : public ASensorBase
+class STEALTHCPP_API ASensorBar : public ASensorBase, public IInteractInterface
 {
 	GENERATED_BODY()
 
@@ -28,4 +29,5 @@ private:
 	UFUNCTION()
 	void OnBoxOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
 
+	virtual void Interact_Implementation() override;
 };

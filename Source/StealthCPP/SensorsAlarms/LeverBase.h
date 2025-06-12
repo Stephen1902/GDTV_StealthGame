@@ -35,6 +35,10 @@ protected:
 	// The sound to be played when the player interacts with this lever
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Levers")
 	TObjectPtr<USoundBase> SoundOnInteract;
+
+	// Which actor will be affected by this lever when used
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Levers")
+	TObjectPtr<AActor> ActorToToggle;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -48,4 +52,9 @@ private:
 	TObjectPtr<USoundAttenuation> SoundAttenuation;
 	
 	virtual void Interact_Implementation() override;
+
+	bool bCanActivate;
+	FTimerHandle ReactivateTimerHandle;
+	UFUNCTION()
+	void ReactiveTimer();
 };

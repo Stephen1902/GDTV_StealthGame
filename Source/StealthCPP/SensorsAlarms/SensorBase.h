@@ -36,6 +36,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sensors")
 	UCurveFloat* FloatCurve;
+
+	bool bIsActive = true;
 public:	
 	virtual void DetectPlayer(AActor* ActorDetected);
 
@@ -52,4 +54,5 @@ private:
 
 	UPROPERTY()
 	FTimerHandle FakeTimerHandle;
+	
 };

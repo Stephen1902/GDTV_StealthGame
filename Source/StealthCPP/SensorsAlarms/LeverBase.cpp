@@ -35,6 +35,8 @@ ALeverBase::ALeverBase()
 	{
 		SoundAttenuation = SoundAtt.Object;
 	}
+
+	bCanActivate = true;
 }
 
 // Called when the game starts or when spawned
@@ -57,16 +59,29 @@ void ALeverBase::Tick(float DeltaTime)
 
 void ALeverBase::SwitchLever()
 {
-	// Play a sound to alert the player this lever has been triggered
-	if (SoundOnInteract && SoundAttenuation)
-	{
-		UGameplayStatics::PlaySoundAtLocation(GetWorld(), SoundOnInteract, GetActorLocation(), 1.f, 1.f, 0.f, SoundAttenuation);
-	}
+	// Only play the animation and activate the interacted with item if not already playing
+	if (bCanActivate)
+	{		
+		// Play a sound to alert the player this lever has been triggered
+		if (SoundOnInteract && SoundAttenuation)
+		{
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), SoundOnInteract, GetActorLocation(), 1.f, 1.f, 0.f, SoundAttenuation);
+		}
+	
+		if (AnimSequence)
+		{
+			SkeletalMeshComp->PlayAnimation(AnimSequence, false);
+			
+			bCanActivate = false;
+			float AnimPlayTime = AnimSequence->GetPlayLength();
+			GetWorldTimerManager().SetTimer(ReactivateTimerHandle, this, &ALeverBase::ReactiveTimer, AnimPlayTime, false, AnimPlayTime);
+		}
 
-	if (AnimSequence)
-    {
-    	SkeletalMeshComp->PlayAnimation(AnimSequence, false);
-    }
+		if (ActorToToggle && ActorToToggle->Implements<UInteractInterface>())
+		{
+			Execute_Interact(ActorToToggle);
+		}
+	}
 }
 
 void ALeverBase::Interact_Implementation()
@@ -74,4 +89,9 @@ void ALeverBase::Interact_Implementation()
 	IInteractInterface::Interact_Implementation();
 
 	SwitchLever();
+}
+
+void ALeverBase::ReactiveTimer()
+{
+	bCanActivate = true;
 }
