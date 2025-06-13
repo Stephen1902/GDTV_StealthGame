@@ -85,9 +85,6 @@ private:
 
 	float StandardCameraPos;
 	float CrouchCameraPos;
-
-	FVector StandardMeshLoc;
-	FVector CrouchedMeshLoc;
 	
 	UPROPERTY()
 	UTimelineComponent* CameraTimeline;
@@ -96,5 +93,7 @@ private:
 	
 	UFUNCTION()
 	void TimelineFloatReturn(float Val);
+
+	bool CheckIfCanUncrouch();
 
 };

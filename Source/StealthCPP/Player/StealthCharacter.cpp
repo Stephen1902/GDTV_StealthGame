@@ -106,9 +106,6 @@ void AStealthCharacter::BeginPlay()
 	StandardCameraPos = SpringArmComp->TargetArmLength;
 	CrouchCameraPos = StandardCameraPos + 150.f;
 
-	StandardMeshLoc = FVector(0.f, 0.f, 0.f);
-	CrouchedMeshLoc = FVector(0.f, 0.f, -40.f);
-
 	if (CameraTimeline)
 	{
 		CameraTimeline->AddInterpFloat(FloatCurve, CameraInterpFunction, FName{ TEXT("Camera Timeline")});
@@ -204,19 +201,22 @@ void AStealthCharacter::ToggleCrouch()
 	}
 	else
 	{
-		bIsCrouching = false;
-		if (UCharacterMovementComponent* CharMovement = GetCharacterMovement())
+		if (!CheckIfCanUncrouch())
 		{
-			CharMovement->MaxWalkSpeed = 600.f;
-		}
+			bIsCrouching = false;
+			if (UCharacterMovementComponent* CharMovement = GetCharacterMovement())
+			{
+				CharMovement->MaxWalkSpeed = 600.f;
+			}
 
-		if (CameraTimeline)
-		{
-			CameraTimeline->ReverseFromEnd();
-		}
-		else
-		{
-			SpringArmComp->TargetArmLength = StandardCameraPos;
+			if (CameraTimeline)
+			{
+				CameraTimeline->ReverseFromEnd();
+			}
+			else
+			{
+				SpringArmComp->TargetArmLength = StandardCameraPos;
+			}
 		}
 	}
 }
@@ -226,5 +226,15 @@ void AStealthCharacter::TimelineFloatReturn(float Val)
 	SpringArmComp->TargetArmLength = UKismetMathLibrary::Lerp(StandardCameraPos, CrouchCameraPos, Val);
 	GetCapsuleComponent()->SetCapsuleHalfHeight(UKismetMathLibrary::Lerp(88.f, 48.f, Val));
 	GetMesh()->SetRelativeLocation(UKismetMathLibrary::VLerp(FVector(0.f, 0.f, -89.f), FVector(0.f, 0.f, -49.f), Val));
+}
+
+bool AStealthCharacter::CheckIfCanUncrouch()
+{
+	FHitResult HitResult;
+	const FVector StartLoc = GetActorLocation();
+	const FVector EndLoc = (GetActorUpVector() * 115.f) + StartLoc;
+	TArray<AActor*> ActorsToIgnore;
+	ActorsToIgnore.Add(this);
+	return UKismetSystemLibrary::SphereTraceSingle(GetWorld(), StartLoc, EndLoc, 32.f, TraceTypeQuery1, false, ActorsToIgnore, EDrawDebugTrace::ForDuration, HitResult, true);
 }
 
