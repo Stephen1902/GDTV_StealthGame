@@ -106,6 +106,9 @@ void AStealthCharacter::BeginPlay()
 	StandardCameraPos = SpringArmComp->TargetArmLength;
 	CrouchCameraPos = StandardCameraPos + 150.f;
 
+	StandardMeshLoc = FVector(0.f, 0.f, 0.f);
+	CrouchedMeshLoc = FVector(0.f, 0.f, -40.f);
+
 	if (CameraTimeline)
 	{
 		CameraTimeline->AddInterpFloat(FloatCurve, CameraInterpFunction, FName{ TEXT("Camera Timeline")});
@@ -221,5 +224,7 @@ void AStealthCharacter::ToggleCrouch()
 void AStealthCharacter::TimelineFloatReturn(float Val)
 {
 	SpringArmComp->TargetArmLength = UKismetMathLibrary::Lerp(StandardCameraPos, CrouchCameraPos, Val);
+	GetCapsuleComponent()->SetCapsuleHalfHeight(UKismetMathLibrary::Lerp(88.f, 48.f, Val));
+	GetMesh()->SetRelativeLocation(UKismetMathLibrary::VLerp(FVector(0.f, 0.f, -89.f), FVector(0.f, 0.f, -49.f), Val));
 }
 
