@@ -17,7 +17,8 @@ public class StealthCPP : ModuleRules
 			"AIModule",
 			"StateTreeModule",
 			"GameplayStateTreeModule",
-			"UMG"
+			"UMG",
+            "MotionWarping"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });

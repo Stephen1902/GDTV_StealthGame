@@ -23,5 +23,5 @@ class STEALTHCPP_API IGuardInterface
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Interaction")
-	bool CanTakeDown(FVector& ActorLocation, FRotator& ActorRotation);
+	void CanTakeDown(FVector& ActorLocation, FRotator& ActorRotation, bool& CanTakeDown, AActor*& IgnoredActor);
 };

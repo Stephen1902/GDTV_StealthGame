@@ -63,9 +63,9 @@ void AEnemyCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInput
 
 }
 
-bool AEnemyCharacterBase::CanTakeDown_Implementation(FVector& ActorLocation, FRotator& ActorRotation)
+void AEnemyCharacterBase::CanTakeDown_Implementation(FVector& ActorLocation, FRotator& ActorRotation, bool& CanTakeDown, AActor*& IgnoredActor)
 {
-	IGuardInterface::CanTakeDown_Implementation(ActorLocation, ActorRotation);
+	IGuardInterface::CanTakeDown_Implementation(ActorLocation, ActorRotation, CanTakeDown, IgnoredActor);
 
 	if (bCanBeTakenDown && TakeDownMontage)
 	{
@@ -75,9 +75,13 @@ bool AEnemyCharacterBase::CanTakeDown_Implementation(FVector& ActorLocation, FRo
 		GetWorldTimerManager().SetTimer(RagdollDelayTimer, this, &AEnemyCharacterBase::RagdollEnemy, AnimLength, false, AnimLength);
 	}
 
+	WidgetComponent->SetVisibility(false);
+	TakeDownRadius->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
 	ActorLocation = RefMesh->GetComponentLocation();
 	ActorRotation = GetActorRotation();
-	return bCanBeTakenDown;
+	CanTakeDown = bCanBeTakenDown;
+	IgnoredActor = this;
 }
 
 void AEnemyCharacterBase::RagdollEnemy()

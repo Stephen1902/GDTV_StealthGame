@@ -2,11 +2,12 @@
 
 
 #include "Player/StealthCharacter.h"
-
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "MotionWarpingComponent.h"
+#include "Framework/GuardInterface.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -32,6 +33,8 @@ AStealthCharacter::AStealthCharacter()
 	CameraComp = CreateDefaultSubobject<UCameraComponent>("Camera");
 	CameraComp->SetupAttachment(SpringArmComp);
 
+	MotionWarpingComp = CreateDefaultSubobject<UMotionWarpingComponent>(TEXT("Motion Warping Comp"));
+
 	this->bUseControllerRotationYaw = false;
 
     if (UCharacterMovementComponent* const MovementComponent = GetCharacterMovement())
@@ -49,6 +52,12 @@ AStealthCharacter::AStealthCharacter()
 				
 		//Bind the Callback function for the float return value
 		CameraInterpFunction.BindUFunction(this, FName{ TEXT("TimelineFloatReturn") });
+	}
+
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> FoundMontage(TEXT("/Game/Player/Animations/Takedown/Takedown_Attacker_Montage"));
+	if (FoundMontage.Succeeded())
+	{
+		TakeDownMontageToPlay = FoundMontage.Object;
 	}
 	
 	Tags.Add(FName("Player"));
@@ -161,11 +170,9 @@ void AStealthCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 void AStealthCharacter::TryToInteract()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Trying To Interact"));
 	TArray<AActor*> OverlappingActors;
 	GetOverlappingActors(OverlappingActors);
 
-	UE_LOG(LogTemp, Warning, TEXT("Found %i overlapping"), OverlappingActors.Num());
 	if (OverlappingActors.Num() > 0)
 	{
 		
@@ -173,7 +180,38 @@ void AStealthCharacter::TryToInteract()
 		{
 			if (It->Implements<UInteractInterface>())
 			{
-				 IInteractInterface::Execute_Interact(It);
+				Execute_Interact(It);
+			}
+
+			if (It->Implements<UGuardInterface>())
+			{
+				FVector GuardLocation;
+				FRotator GuardRotation;
+				bool CanTakeDownGuard;
+				AActor* ActorToIgnore;
+				Execute_CanTakeDown(It, GuardLocation, GuardRotation, CanTakeDownGuard, ActorToIgnore);
+
+				if (CanTakeDownGuard)
+				{
+					if (TakeDownMontageToPlay)
+					{
+						if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
+						{
+							AnimInstance->Montage_Play(TakeDownMontageToPlay, 1.0f);
+
+							FMotionWarpingTarget MotionWarpingTarget;
+							MotionWarpingTarget.Name = FName("TakeDown");
+							MotionWarpingTarget.Location = GuardLocation;
+							MotionWarpingTarget.Rotation = GuardRotation;
+							MotionWarpingComp->AddOrUpdateWarpTarget(MotionWarpingTarget);
+
+							GetCapsuleComponent()->IgnoreActorWhenMoving(ActorToIgnore, true);
+							GetMesh()->IgnoreActorWhenMoving(ActorToIgnore, true);
+						}
+						
+					}
+					
+				}
 			}
 		}
 	}

@@ -6,6 +6,7 @@
 #include "Framework/InteractInterface.h"
 #include "GameFramework/Character.h"
 #include "Components/TimelineComponent.h"
+#include "Framework/GuardInterface.h"
 #include "StealthCharacter.generated.h"
 
 class USpringArmComponent;
@@ -15,7 +16,7 @@ class UInputAction;
 struct FInputActionValue;
 
 UCLASS()
-class STEALTHCPP_API AStealthCharacter : public ACharacter, public IInteractInterface
+class STEALTHCPP_API AStealthCharacter : public ACharacter, public IInteractInterface, public IGuardInterface
 {
 	GENERATED_BODY()
 
@@ -42,6 +43,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player")
 	TObjectPtr<UCameraComponent> CameraComp;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player")
+	TObjectPtr<UAnimMontage> TakeDownMontageToPlay;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sensors")
 	UCurveFloat* FloatCurve;
 
@@ -96,4 +100,6 @@ private:
 
 	bool CheckIfCanUncrouch();
 
+	UPROPERTY()
+	TObjectPtr<class UMotionWarpingComponent> MotionWarpingComp; 
 };
