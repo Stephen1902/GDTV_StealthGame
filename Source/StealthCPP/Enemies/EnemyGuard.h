@@ -27,8 +27,22 @@ protected:
 	// Speed when chasing a player
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy Base")
 	float ChasingSpeed;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Enemy Base")
+	TObjectPtr<UAnimMontage> CatchMontageToPlay;
 
 private:
+	UPROPERTY()
+	TObjectPtr<UAnimInstance> AnimInstance;
+
+	UFUNCTION()
+	void AnimMontageHasEnded(UAnimMontage* Montage, bool bInterrupted);
+
+	bool bIsAttacking;
+	
 	UFUNCTION()
 	virtual void MakeGuardRun_Implementation() override;
+
+	UFUNCTION()
+	virtual void MakeGuardCatch_Implementation() override;
 };

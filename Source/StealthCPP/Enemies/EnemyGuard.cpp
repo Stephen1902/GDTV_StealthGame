@@ -21,12 +21,25 @@ AEnemyGuard::AEnemyGuard()
 	// Default walk and chasing speed for this enemy
 	WalkingSpeed = 150.f;
 	ChasingSpeed = 500.f;
+
+	bIsAttacking = false;
 }
 void AEnemyGuard::BeginPlay()
 {
 	Super::BeginPlay();
 
 	GetCharacterMovement()->MaxWalkSpeed = WalkingSpeed;
+
+	AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance)
+	{
+		AnimInstance->OnMontageEnded.AddDynamic(this, &AEnemyGuard::AnimMontageHasEnded);
+	}
+}
+
+void AEnemyGuard::AnimMontageHasEnded(UAnimMontage* Montage, bool bInterrupted)
+{
+	bIsAttacking = false;
 }
 
 void AEnemyGuard::MakeGuardRun_Implementation()
@@ -37,5 +50,16 @@ void AEnemyGuard::MakeGuardRun_Implementation()
 	{
 		GetCharacterMovement()->MaxWalkSpeed = ChasingSpeed;
 		UE_LOG(LogTemp, Warning, TEXT("Guard Runs"));
+	}
+}
+
+void AEnemyGuard::MakeGuardCatch_Implementation()
+{
+	Super::MakeGuardCatch_Implementation();
+
+	if (CatchMontageToPlay && AnimInstance && !bIsAttacking)
+	{
+		bIsAttacking = true;
+		AnimInstance->Montage_Play(CatchMontageToPlay, 1.0f);
 	}
 }
