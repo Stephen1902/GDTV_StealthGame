@@ -19,10 +19,16 @@ class STEALTHCPP_API AEnemyGuard : public AEnemyCharacterBase
 protected:
 	// Called at game start
 	virtual void BeginPlay() override;
-	
+
+	// Default speed for this enemy when patrolling / walking
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy Base")
-	TObjectPtr<class UBehaviorTreeComponent> BehaviorTreeComponent;
-	
+	float WalkingSpeed;
+
+	// Speed when chasing a player
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy Base")
-	TObjectPtr<class UBehaviorTree> BehaviorTreeToRun;
+	float ChasingSpeed;
+
+private:
+	UFUNCTION()
+	virtual void MakeGuardRun_Implementation() override;
 };

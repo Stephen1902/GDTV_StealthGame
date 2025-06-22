@@ -24,4 +24,7 @@ class STEALTHCPP_API IGuardInterface
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Interaction")
 	void CanTakeDown(FVector& ActorLocation, FRotator& ActorRotation, bool& CanTakeDown, AActor*& IgnoredActor);
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Interaction")
+	void MakeGuardRun();
 };
