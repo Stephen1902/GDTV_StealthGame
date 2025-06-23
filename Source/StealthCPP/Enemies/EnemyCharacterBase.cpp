@@ -5,6 +5,8 @@
 
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
+#include "Perception/AIPerceptionSystem.h"
+#include "Perception/AISense_Sight.h"
 #include "Player/StealthCharacter.h"
 
 // Sets default values
@@ -47,8 +49,8 @@ void AEnemyCharacterBase::BeginPlay()
 
 	TakeDownRadius->OnComponentBeginOverlap.AddDynamic(this, &AEnemyCharacterBase::OnTakeDownOverlapBegin);
 	TakeDownRadius->OnComponentEndOverlap.AddDynamic(this, &AEnemyCharacterBase::OnTakeDownOverlapEnd);
+	
 }
-
 // Called every frame
 void AEnemyCharacterBase::Tick(float DeltaTime)
 {

@@ -12,6 +12,9 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Perception/AIPerceptionStimuliSourceComponent.h"
+#include "Perception/AIPerceptionSystem.h"
+#include "Perception/AISense_Sight.h"
 
 // Sets default values
 AStealthCharacter::AStealthCharacter()
@@ -34,6 +37,8 @@ AStealthCharacter::AStealthCharacter()
 	CameraComp->SetupAttachment(SpringArmComp);
 
 	MotionWarpingComp = CreateDefaultSubobject<UMotionWarpingComponent>(TEXT("Motion Warping Comp"));
+
+	StimuliSourceComponent = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("Stimulus Source Comp"));
 
 	this->bUseControllerRotationYaw = false;
 
@@ -120,6 +125,9 @@ void AStealthCharacter::BeginPlay()
 		CameraTimeline->AddInterpFloat(FloatCurve, CameraInterpFunction, FName{ TEXT("Camera Timeline")});
 		CameraTimeline->SetLooping(false);
 	}
+
+	StimuliSourceComponent->RegisterWithPerceptionSystem();
+	StimuliSourceComponent->RegisterForSense(UAISense_Sight::StaticClass());
 }
 
 // Called every frame

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
+#include "BehaviorTree/BehaviorTreeTypes.h"
 #include "EnemyAIController.generated.h"
 
 /**
@@ -24,9 +25,19 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Guard Controller")
 	TObjectPtr<UBehaviorTree> BehaviorTreeToRun;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Guard Controller")
+	TObjectPtr<UAIPerceptionComponent> PerceptionComp;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Guard Controller")
+	class UAISenseConfig_Sight* SightConfig;
+
 //	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy Base")
 //	TObjectPtr<UBlackboardComponent> BlackboardComponent;
 	
 //	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy Base")
 //	TObjectPtr<UBlackboardData> BehaviorTreeData;
+
+private:
+	UFUNCTION()
+	void PerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
 };

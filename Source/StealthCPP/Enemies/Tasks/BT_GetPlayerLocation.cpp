@@ -23,10 +23,7 @@ EBTNodeResult::Type UBT_GetPlayerLocation::ExecuteTask(UBehaviorTreeComponent& O
 			}
 		}
 		return EBTNodeResult::Succeeded;
-	
 	}
-	
-	UE_LOG(LogTemp, Warning, TEXT("Has a player character.  Does not have a blackboard component.")); 
 	
 	return EBTNodeResult::Failed;
 }
