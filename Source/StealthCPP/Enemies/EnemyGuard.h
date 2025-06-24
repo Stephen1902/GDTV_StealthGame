@@ -38,6 +38,9 @@ private:
 	UFUNCTION()
 	void AnimMontageHasEnded(UAnimMontage* Montage, bool bInterrupted);
 
+	UFUNCTION()
+	void AnimNotify(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload);
+
 	bool bIsAttacking;
 	
 	UFUNCTION()

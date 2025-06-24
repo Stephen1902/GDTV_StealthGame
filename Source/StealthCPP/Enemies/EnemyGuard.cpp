@@ -3,6 +3,7 @@
 #include "Enemies/EnemyGuard.h"
 #include "EnemyAIController.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 AEnemyGuard::AEnemyGuard()
 {
@@ -34,12 +35,32 @@ void AEnemyGuard::BeginPlay()
 	if (AnimInstance)
 	{
 		AnimInstance->OnMontageEnded.AddDynamic(this, &AEnemyGuard::AnimMontageHasEnded);
+		AnimInstance->OnPlayMontageNotifyBegin.AddDynamic(this, &AEnemyGuard::AnimNotify);
 	}
 }
 
 void AEnemyGuard::AnimMontageHasEnded(UAnimMontage* Montage, bool bInterrupted)
 {
 	bIsAttacking = false;
+}
+
+void AEnemyGuard::AnimNotify(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload)
+{
+	const FVector StartLocation = GetActorLocation();
+	const FVector EndLocation = (GetActorForwardVector() * 128.f) + StartLocation;
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectsToTraceFor;
+	ObjectsToTraceFor.Add(ObjectTypeQuery3);
+	TArray<AActor*> ActorToIgnore;
+	ActorToIgnore.Add(this);
+	FHitResult HitResult;
+	if (UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), StartLocation, EndLocation, 32.f, ObjectsToTraceFor, false, ActorToIgnore, EDrawDebugTrace::ForDuration, HitResult, true))
+	{
+		if (HitResult.GetActor()->ActorHasTag(FName("Player")))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Got the player"));
+		}
+	}
+	
 }
 
 void AEnemyGuard::MakeGuardRun_Implementation()
