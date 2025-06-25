@@ -2,6 +2,7 @@
 
 #include "Enemies/EnemyGuard.h"
 #include "EnemyAIController.h"
+#include "Framework/StealthGameMode.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 
@@ -70,7 +71,6 @@ void AEnemyGuard::MakeGuardRun_Implementation()
 	if (GetCharacterMovement()->MaxWalkSpeed != ChasingSpeed)
 	{
 		GetCharacterMovement()->MaxWalkSpeed = ChasingSpeed;
-		UE_LOG(LogTemp, Warning, TEXT("Guard Runs"));
 	}
 }
 
@@ -82,5 +82,10 @@ void AEnemyGuard::MakeGuardCatch_Implementation()
 	{
 		bIsAttacking = true;
 		AnimInstance->Montage_Play(CatchMontageToPlay, 1.0f);
+
+		if (AStealthGameMode* StealthGameMode = Cast<AStealthGameMode>(GetWorld()->GetAuthGameMode()))
+		{
+			StealthGameMode->CreateCapturedWidget();
+		}
 	}
 }
