@@ -45,8 +45,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Alarm")
 	TObjectPtr<USoundBase> AlarmSoundToPlay;
 private:
-
-
 	UPROPERTY()
 	TObjectPtr<UAudioComponent> SoundBeingPlayed;
 	

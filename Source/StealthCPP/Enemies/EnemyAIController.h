@@ -31,6 +31,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Guard Controller")
 	class UAISenseConfig_Sight* SightConfig;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Guard Controller")
+	TObjectPtr<USoundBase> ShoutSoundToPlay;
+
 //	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy Base")
 //	TObjectPtr<UBlackboardComponent> BlackboardComponent;
 	
@@ -40,4 +43,13 @@ protected:
 private:
 	UFUNCTION()
 	void PerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
+
+public:
+	void AlarmHasBeenTriggered();
+
+	UPROPERTY()
+	FTimerHandle ShoutTimerHandle;
+
+	UFUNCTION()
+	void ShoutTimerFinished();
 };

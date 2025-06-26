@@ -31,6 +31,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Enemy Base")
 	TObjectPtr<UAnimMontage> CatchMontageToPlay;
 
+
 private:
 	UPROPERTY()
 	TObjectPtr<UAnimInstance> AnimInstance;
@@ -42,10 +43,13 @@ private:
 	void AnimNotify(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload);
 
 	bool bIsAttacking;
+	bool bHasAttacked;
 	
 	UFUNCTION()
 	virtual void MakeGuardRun_Implementation() override;
 
 	UFUNCTION()
 	virtual void MakeGuardCatch_Implementation() override;
+
+
 };

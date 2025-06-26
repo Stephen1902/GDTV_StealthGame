@@ -2,9 +2,12 @@
 
 #include "Enemies/EnemyGuard.h"
 #include "EnemyAIController.h"
+#include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Framework/StealthGameMode.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "SensorsAlarms/Alarm.h"
 
 AEnemyGuard::AEnemyGuard()
 {
@@ -25,6 +28,7 @@ AEnemyGuard::AEnemyGuard()
 	ChasingSpeed = 500.f;
 
 	bIsAttacking = false;
+	bHasAttacked = false;
 }
 void AEnemyGuard::BeginPlay()
 {
@@ -56,12 +60,15 @@ void AEnemyGuard::AnimNotify(FName NotifyName, const FBranchingPointNotifyPayloa
 	FHitResult HitResult;
 	if (UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), StartLocation, EndLocation, 32.f, ObjectsToTraceFor, false, ActorToIgnore, EDrawDebugTrace::ForDuration, HitResult, true))
 	{
-		if (HitResult.GetActor()->ActorHasTag(FName("Player")))
+		if (HitResult.GetActor()->ActorHasTag(FName("Player")) && !bHasAttacked)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Got the player"));
+			if (AStealthGameMode* StealthGameMode = Cast<AStealthGameMode>(GetWorld()->GetAuthGameMode()))
+			{
+				bHasAttacked = true;
+				StealthGameMode->CreateCapturedWidget();
+			}
 		}
 	}
-	
 }
 
 void AEnemyGuard::MakeGuardRun_Implementation()
@@ -82,10 +89,6 @@ void AEnemyGuard::MakeGuardCatch_Implementation()
 	{
 		bIsAttacking = true;
 		AnimInstance->Montage_Play(CatchMontageToPlay, 1.0f);
-
-		if (AStealthGameMode* StealthGameMode = Cast<AStealthGameMode>(GetWorld()->GetAuthGameMode()))
-		{
-			StealthGameMode->CreateCapturedWidget();
-		}
 	}
 }
+

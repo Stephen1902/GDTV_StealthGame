@@ -51,6 +51,8 @@ void AAlarm::StartAlarm()
 		SpotLightOne->SetVisibility(true);
 		SpotLightTwo->SetVisibility(true);
 	}
+
+	
 }
 
 void AAlarm::StopAlarm()

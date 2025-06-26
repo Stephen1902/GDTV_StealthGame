@@ -4,9 +4,11 @@
 
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Blueprint/AIBlueprintHelperLibrary.h"
+#include "Kismet/GameplayStatics.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
-#include "Perception/AISense_Hearing.h"
+#include "SensorsAlarms/Alarm.h"
 
 
 AEnemyAIController::AEnemyAIController()
@@ -61,7 +63,41 @@ void AEnemyAIController::PerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
 		// Check if the actor sense was successful
 		if (Stimulus.WasSuccessfullySensed())
 		{
+			if (ShoutSoundToPlay && !BehaviorTreeComponent->GetBlackboardComponent()->GetValueAsBool(FName("PlayerSeen")))
+			{
+				UGameplayStatics::PlaySoundAtLocation(GetWorld(), ShoutSoundToPlay, GetPerceptionComponent()->GetOwner()->GetActorLocation());
+			}
+
 			BehaviorTreeComponent->GetBlackboardComponent()->SetValueAsBool(FName("PlayerSeen"), true);
+
+			GetWorld()->GetTimerManager().SetTimer(ShoutTimerHandle, this, &AEnemyAIController::ShoutTimerFinished, 0.2f, false, 0.2f);
+		}
+	}
+}
+
+void AEnemyAIController::AlarmHasBeenTriggered()
+{
+	BehaviorTreeComponent->GetBlackboardComponent()->SetValueAsBool(FName("PlayerSeen"), true);
+}
+
+void AEnemyAIController::ShoutTimerFinished()
+{
+	GetWorld()->GetTimerManager().ClearTimer(ShoutTimerHandle);
+	
+	if (AAlarm* AlarmActor = Cast<AAlarm>(UGameplayStatics::GetActorOfClass(GetWorld(), AAlarm::StaticClass())))
+	{
+		AlarmActor->StartAlarm();
+	}
+
+	TArray<AActor*> FoundGuards;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), StaticClass(), FoundGuards);
+
+	UE_LOG(LogTemp, Warning, TEXT("Guards found %i"), FoundGuards.Num())
+	for (auto& It : FoundGuards)
+	{
+		if (AEnemyAIController* GuardController = Cast<AEnemyAIController>(UAIBlueprintHelperLibrary::GetAIController(It)))
+		{
+			GuardController->AlarmHasBeenTriggered();
 		}
 	}
 }
