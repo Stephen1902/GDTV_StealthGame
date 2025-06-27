@@ -47,6 +47,9 @@ protected:
 	TObjectPtr<UAnimMontage> TakeDownMontageToPlay;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player")
+	TObjectPtr<UAnimMontage> RollMontageToPlay;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player")
 	TObjectPtr<class UAIPerceptionStimuliSourceComponent> StimuliSourceComponent;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sensors")
@@ -75,6 +78,9 @@ protected:
 	/** Crouch Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* CrouchAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* DodgeRollAction;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -89,6 +95,12 @@ private:
 	bool bIsCrouching;
 	UFUNCTION()
 	void ToggleCrouch();
+
+	bool bIsDodging;
+	UFUNCTION()
+	void DodgeRoll();
+	UFUNCTION()
+	void MontageHasFinished(UAnimMontage* Montage, bool bInterrupted);
 
 	float StandardCameraPos;
 	float CrouchCameraPos;

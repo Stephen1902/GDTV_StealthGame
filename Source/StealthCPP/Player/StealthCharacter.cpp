@@ -13,7 +13,6 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
-#include "Perception/AIPerceptionSystem.h"
 #include "Perception/AISense_Sight.h"
 
 // Sets default values
@@ -64,10 +63,17 @@ AStealthCharacter::AStealthCharacter()
 	{
 		TakeDownMontageToPlay = FoundMontage.Object;
 	}
+
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> RollMontage(TEXT("/Game/Player/Animations/Roll/Roll_Montage"));
+	if (RollMontage.Succeeded())
+	{
+		RollMontageToPlay = RollMontage.Object;
+	}
 	
 	Tags.Add(FName("Player"));
 
 	bIsCrouching = false;
+	bIsDodging = false;
 }
 
 void AStealthCharacter::Move(const FInputActionValue& Value)
@@ -126,6 +132,11 @@ void AStealthCharacter::BeginPlay()
 		CameraTimeline->SetLooping(false);
 	}
 
+	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
+	{
+		AnimInstance->OnMontageEnded.AddDynamic(this, &AStealthCharacter::MontageHasFinished);
+	}
+	
 	StimuliSourceComponent->RegisterWithPerceptionSystem();
 	StimuliSourceComponent->RegisterForSense(UAISense_Sight::StaticClass());
 }
@@ -169,6 +180,9 @@ void AStealthCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 		// Crouch
 		EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Started, this, &AStealthCharacter::ToggleCrouch);
+
+		// Dodge
+		EnhancedInputComponent->BindAction(DodgeRollAction, ETriggerEvent::Started, this, &AStealthCharacter::DodgeRoll);
 	}
 	else
 	{
@@ -227,7 +241,6 @@ void AStealthCharacter::TryToInteract()
 
 void AStealthCharacter::ToggleCrouch()
 {
-	UE_LOG(LogTemp, Warning, TEXT("ToggleCrouch"));
 	if (!bIsCrouching)
 	{
 		bIsCrouching = true;
@@ -264,6 +277,27 @@ void AStealthCharacter::ToggleCrouch()
 				SpringArmComp->TargetArmLength = StandardCameraPos;
 			}
 		}
+	}
+}
+
+void AStealthCharacter::DodgeRoll()
+{
+	if (RollMontageToPlay && !bIsDodging)
+	{
+		if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
+		{
+			bIsDodging = true;
+			AnimInstance->Montage_Play(RollMontageToPlay, 1.0f);
+		}
+	}
+
+}
+
+void AStealthCharacter::MontageHasFinished(UAnimMontage* Montage, bool bInterrupted)
+{
+	if (Montage == RollMontageToPlay)
+	{
+		bIsDodging = false;
 	}
 }
 
