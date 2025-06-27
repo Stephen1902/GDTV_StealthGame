@@ -21,16 +21,18 @@ protected:
 	virtual void BeginPlay() override;
 
 	// Default speed for this enemy when patrolling / walking
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy Base")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy Guard")
 	float WalkingSpeed;
 
 	// Speed when chasing a player
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy Base")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy Guard")
 	float ChasingSpeed;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Enemy Base")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Enemy Guard")
 	TObjectPtr<UAnimMontage> CatchMontageToPlay;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Enemy Guard")
+	class UWaypointComponent* WaypointComponent;
 
 private:
 	UPROPERTY()

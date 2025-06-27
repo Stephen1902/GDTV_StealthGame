@@ -2,16 +2,16 @@
 
 #include "Enemies/EnemyGuard.h"
 #include "EnemyAIController.h"
-#include "Blueprint/AIBlueprintHelperLibrary.h"
+#include "WaypointComponent.h"
 #include "Framework/StealthGameMode.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
-#include "SensorsAlarms/Alarm.h"
 
 AEnemyGuard::AEnemyGuard()
 {
 	// Default settings are placed here
+
+	WaypointComponent = CreateDefaultSubobject<UWaypointComponent>(TEXT("Waypoint Comp"));
 	
 	AIControllerClass = AEnemyAIController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
