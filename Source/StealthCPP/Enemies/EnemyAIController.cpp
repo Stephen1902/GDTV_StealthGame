@@ -88,16 +88,4 @@ void AEnemyAIController::ShoutTimerFinished()
 	{
 		AlarmActor->StartAlarm();
 	}
-
-	TArray<AActor*> FoundGuards;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), StaticClass(), FoundGuards);
-
-	UE_LOG(LogTemp, Warning, TEXT("Guards found %i"), FoundGuards.Num())
-	for (auto& It : FoundGuards)
-	{
-		if (AEnemyAIController* GuardController = Cast<AEnemyAIController>(UAIBlueprintHelperLibrary::GetAIController(It)))
-		{
-			GuardController->AlarmHasBeenTriggered();
-		}
-	}
 }

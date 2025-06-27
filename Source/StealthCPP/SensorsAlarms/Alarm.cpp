@@ -3,8 +3,12 @@
 
 #include "SensorsAlarms/Alarm.h"
 
+#include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Components/AudioComponent.h"
 #include "Components/SpotLightComponent.h"
+#include "Enemies/EnemyAIController.h"
+#include "Enemies/EnemyGuard.h"
+#include "Framework/StealthGameMode.h"
 #include "GameFramework/RotatingMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -41,6 +45,19 @@ void AAlarm::BeginPlay()
 	Super::BeginPlay();
 }
 
+void AAlarm::TriggerAllGuards()
+{
+	TArray<AActor*> FoundGuards;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemyGuard::StaticClass(), FoundGuards);
+	for (auto& It : FoundGuards)
+	{
+		if (AEnemyAIController* GuardController = Cast<AEnemyAIController>(UAIBlueprintHelperLibrary::GetAIController(It)))
+		{
+			GuardController->AlarmHasBeenTriggered();
+		}
+	}
+}
+
 void AAlarm::StartAlarm()
 {
 	if (!bIsAlarmSounding && AlarmSoundToPlay && RotatingMovementComp)
@@ -52,7 +69,12 @@ void AAlarm::StartAlarm()
 		SpotLightTwo->SetVisibility(true);
 	}
 
-	
+	TriggerAllGuards();
+
+	if (AStealthGameMode* GameModeRef = Cast<AStealthGameMode>(GetWorld()->GetAuthGameMode()))
+	{
+		GameModeRef->SwitchToEscapeMusic();
+	}
 }
 
 void AAlarm::StopAlarm()

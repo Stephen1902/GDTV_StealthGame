@@ -49,4 +49,7 @@ private:
 	TObjectPtr<UAudioComponent> SoundBeingPlayed;
 	
 	bool bIsAlarmSounding;
+
+	void TriggerAllGuards();
+	
 };
