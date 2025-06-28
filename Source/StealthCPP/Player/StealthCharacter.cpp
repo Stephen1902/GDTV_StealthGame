@@ -7,6 +7,7 @@
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "MotionWarpingComponent.h"
+#include "Blueprint/UserWidget.h"
 #include "Framework/GuardInterface.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -14,6 +15,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
 #include "Perception/AISense_Sight.h"
+#include "UI/DetectionWidget.h"
 
 // Sets default values
 AStealthCharacter::AStealthCharacter()
@@ -68,6 +70,12 @@ AStealthCharacter::AStealthCharacter()
 	if (RollMontage.Succeeded())
 	{
 		RollMontageToPlay = RollMontage.Object;
+	}
+
+	static ConstructorHelpers::FClassFinder<UDetectionWidget> DetectionFound(TEXT("/Game/UI/WBP_Detection"));
+	if (DetectionFound.Succeeded())
+	{
+		DetectionWidgetToDisplay = DetectionFound.Class;
 	}
 	
 	Tags.Add(FName("Player"));
@@ -139,6 +147,12 @@ void AStealthCharacter::BeginPlay()
 	
 	StimuliSourceComponent->RegisterWithPerceptionSystem();
 	StimuliSourceComponent->RegisterForSense(UAISense_Sight::StaticClass());
+
+	if (DetectionWidgetToDisplay)
+	{
+		DetectionWidgetRef = CreateWidget<UDetectionWidget>(UGameplayStatics::GetPlayerController(GetWorld(), 0), DetectionWidgetToDisplay);
+		DetectionWidgetRef->AddToViewport();
+	}
 }
 
 // Called every frame

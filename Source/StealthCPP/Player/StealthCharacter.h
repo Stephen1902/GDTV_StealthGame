@@ -55,6 +55,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sensors")
 	UCurveFloat* FloatCurve;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player")
+	TSubclassOf<class UDetectionWidget> DetectionWidgetToDisplay;
+
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputMappingContext* DefaultMappingContext;
@@ -116,5 +119,7 @@ private:
 	bool CheckIfCanUncrouch();
 
 	UPROPERTY()
-	TObjectPtr<class UMotionWarpingComponent> MotionWarpingComp; 
+	TObjectPtr<class UMotionWarpingComponent> MotionWarpingComp;
+
+	TObjectPtr<UDetectionWidget> DetectionWidgetRef;
 };
