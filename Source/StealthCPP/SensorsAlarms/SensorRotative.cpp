@@ -2,6 +2,7 @@
 
 #include "SensorsAlarms/SensorRotative.h"
 
+#include "Components/ProgressBar.h"
 #include "Components/SpotLightComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 
@@ -37,6 +38,10 @@ ASensorRotative::ASensorRotative()
 		RotateFunction.BindUFunction(this, FName{ TEXT("TimelineRotateReturn") });
 		EndOfRotateFunction.BindUFunction(this, FName{TEXT("EndOfRotation")});
 	}
+
+	bPlayerInZone = false;
+	TimeInZone = 0.f;
+	TimeToFillDetectionGauge = 3.0f;
 }
 
 void ASensorRotative::BeginPlay()
@@ -55,7 +60,14 @@ void ASensorRotative::BeginPlay()
 
 void ASensorRotative::OnMeshOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	DetectPlayer(OtherActor);
+	// Check if it's the player 
+	if (OtherActor->ActorHasTag(FName("Player")))
+	{
+		bPlayerInZone = true;
+		FTimerDelegate TimerDelegate;
+		TimerDelegate.BindUFunction(this, "PlayerInZone", OtherActor);
+		GetWorld()->GetTimerManager().SetTimer(PlayerInZoneTimer, TimerDelegate, 0.002f, true, 0.f);
+	}	
 }
 
 void ASensorRotative::TimelineRotateReturn(float Val)
@@ -77,4 +89,24 @@ void ASensorRotative::EndOfRotation()
 		bTimelineForward = true;
 		RotateTimeline->PlayFromStart();
 	}
+}
+
+void ASensorRotative::PlayerInZone(AActor* OtherActor)
+{
+	TimeInZone += 0.005f;
+	const FString StringToDisplay = FString::SanitizeFloat(TimeInZone);
+	
+	UpdateProgressBar();
+
+	// Check if the player has stood in the zone for longer than the detection time
+	if (TimeInZone > TimeToFillDetectionGauge)
+	{
+		// Call the detect player in the sensor base class
+		DetectPlayer(OtherActor);
+	}
+}
+
+void ASensorRotative::UpdateProgressBar()
+{
+	
 }

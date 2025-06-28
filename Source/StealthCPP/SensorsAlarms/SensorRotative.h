@@ -35,10 +35,16 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sensors")
 	FRotator BackwardRotation;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sensors")
+	float TimeToFillDetectionGauge;
 private:
 	UFUNCTION()
 	void OnMeshOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
-
+/*
+	UFUNCTION()
+	void 
+*/
 	UPROPERTY()
 	UTimelineComponent* RotateTimeline;
 
@@ -52,4 +58,11 @@ private:
 	void EndOfRotation();
 
 	bool bTimelineForward;
+	
+	bool bPlayerInZone;
+	FTimerHandle PlayerInZoneTimer;
+	UFUNCTION()
+	void PlayerInZone(AActor* OtherActor);
+	void UpdateProgressBar();
+	float TimeInZone;
 };
