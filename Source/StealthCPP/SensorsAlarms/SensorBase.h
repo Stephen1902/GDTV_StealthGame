@@ -38,11 +38,12 @@ protected:
 	UCurveFloat* FloatCurve;
 
 	bool bIsActive = true;
+	bool bHasBeenTriggered;
 public:	
 	virtual void DetectPlayer(AActor* ActorDetected);
 
 private:
-	bool bHasBeenTriggered;
+	
 
 	UPROPERTY()
 	UTimelineComponent* FlashTimeline;

@@ -51,6 +51,7 @@ void ASensorRotative::BeginPlay()
 	Super::BeginPlay();
 
 	DetectionMeshComp->OnComponentBeginOverlap.AddDynamic(this, &ASensorRotative::OnMeshOverlapped);
+	DetectionMeshComp->OnComponentEndOverlap.AddDynamic(this, &ASensorRotative::OnMeshOverlapEnd);
 
 	if (RotateTimeline)
 	{
@@ -58,8 +59,6 @@ void ASensorRotative::BeginPlay()
 		RotateTimeline->SetTimelineFinishedFunc(EndOfRotateFunction);
 		RotateTimeline->Play();
 	}
-
-	
 }
 
 void ASensorRotative::OnMeshOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -72,6 +71,21 @@ void ASensorRotative::OnMeshOverlapped(UPrimitiveComponent* OverlappedComponent,
 		TimerDelegate.BindUFunction(this, "PlayerInZone", OtherActor);
 		GetWorld()->GetTimerManager().SetTimer(PlayerInZoneTimer, TimerDelegate, 0.002f, true, 0.f);
 	}	
+}
+
+void ASensorRotative::OnMeshOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (OtherActor->ActorHasTag(FName("Player")))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Out"));
+		bPlayerInZone = false;
+		// If the player has not triggered the sensor, reset everything
+		if (!bHasBeenTriggered)
+		{
+			GetWorld()->GetTimerManager().ClearTimer(PlayerInZoneTimer);
+			GetWorld()->GetTimerManager().SetTimer(PlayerInZoneTimer, this, &ASensorRotative::PlayerOutOfZone, 0.002f, true, 0.f);
+		}
+	}
 }
 
 void ASensorRotative::TimelineRotateReturn(float Val)
@@ -108,6 +122,19 @@ void ASensorRotative::PlayerInZone(AActor* OtherActor)
 		DetectPlayer(OtherActor);
 		GetWorld()->GetTimerManager().ClearTimer(PlayerInZoneTimer);
 	}
+}
+
+void ASensorRotative::PlayerOutOfZone()
+{
+	TimeInZone -= 0.005f;
+
+	UpdateProgressBar();
+
+	if (TimeInZone <= 0.f)
+	{
+		GetWorld()->GetTimerManager().ClearTimer(PlayerInZoneTimer);
+	}
+	
 }
 
 void ASensorRotative::UpdateProgressBar()

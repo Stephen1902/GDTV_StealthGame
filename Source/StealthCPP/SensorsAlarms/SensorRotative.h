@@ -41,10 +41,10 @@ protected:
 private:
 	UFUNCTION()
 	void OnMeshOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
-/*
+
 	UFUNCTION()
-	void 
-*/
+	void OnMeshOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
 	UPROPERTY()
 	UTimelineComponent* RotateTimeline;
 
@@ -65,6 +65,8 @@ private:
 	FTimerHandle PlayerInZoneTimer;
 	UFUNCTION()
 	void PlayerInZone(AActor* OtherActor);
+	UFUNCTION()
+	void PlayerOutOfZone();
 	void UpdateProgressBar();
 	float TimeInZone;
 };
