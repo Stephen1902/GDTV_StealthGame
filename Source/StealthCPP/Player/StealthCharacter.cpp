@@ -204,6 +204,14 @@ void AStealthCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	}
 }
 
+void AStealthCharacter::SetWidgetPercent(float CurrentPercent)
+{
+	if (DetectionWidgetRef)
+	{
+		DetectionWidgetRef->UpdateProgressPercent(CurrentPercent);
+	}
+}
+
 void AStealthCharacter::TryToInteract()
 {
 	TArray<AActor*> OverlappingActors;

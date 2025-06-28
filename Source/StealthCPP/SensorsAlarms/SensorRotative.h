@@ -58,7 +58,9 @@ private:
 	void EndOfRotation();
 
 	bool bTimelineForward;
-	
+
+	UPROPERTY()
+	class AStealthCharacter* PlayerRef;
 	bool bPlayerInZone;
 	FTimerHandle PlayerInZoneTimer;
 	UFUNCTION()

@@ -4,7 +4,9 @@
 
 #include "Components/ProgressBar.h"
 #include "Components/SpotLightComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Player/StealthCharacter.h"
 
 ASensorRotative::ASensorRotative()
 {
@@ -56,6 +58,8 @@ void ASensorRotative::BeginPlay()
 		RotateTimeline->SetTimelineFinishedFunc(EndOfRotateFunction);
 		RotateTimeline->Play();
 	}
+
+	
 }
 
 void ASensorRotative::OnMeshOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -94,7 +98,6 @@ void ASensorRotative::EndOfRotation()
 void ASensorRotative::PlayerInZone(AActor* OtherActor)
 {
 	TimeInZone += 0.005f;
-	const FString StringToDisplay = FString::SanitizeFloat(TimeInZone);
 	
 	UpdateProgressBar();
 
@@ -103,10 +106,19 @@ void ASensorRotative::PlayerInZone(AActor* OtherActor)
 	{
 		// Call the detect player in the sensor base class
 		DetectPlayer(OtherActor);
+		GetWorld()->GetTimerManager().ClearTimer(PlayerInZoneTimer);
 	}
 }
 
 void ASensorRotative::UpdateProgressBar()
 {
-	
+	if (!PlayerRef)
+	{
+		PlayerRef = Cast<AStealthCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	}
+
+	if (PlayerRef)
+	{
+		PlayerRef->SetWidgetPercent(TimeInZone / TimeToFillDetectionGauge);
+	}
 }

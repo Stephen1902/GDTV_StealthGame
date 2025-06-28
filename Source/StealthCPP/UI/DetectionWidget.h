@@ -26,4 +26,7 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Detection Widget", meta=(BindWidget))
 	class UTextBlock* DetectionText;
+
+public:
+	void UpdateProgressPercent(float CurrentPercent);
 };
