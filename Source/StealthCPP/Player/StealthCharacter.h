@@ -84,6 +84,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* DodgeRollAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* MantleAction;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -106,6 +109,10 @@ private:
 	void DodgeRoll();
 	UFUNCTION()
 	void MontageHasFinished(UAnimMontage* Montage, bool bInterrupted);
+
+	bool bIsMantling;
+	UFUNCTION()
+	void TryMantleClimb();
 
 	float StandardCameraPos;
 	float CrouchCameraPos;

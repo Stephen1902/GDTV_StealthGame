@@ -82,6 +82,7 @@ AStealthCharacter::AStealthCharacter()
 
 	bIsCrouching = false;
 	bIsDodging = false;
+	bIsMantling = false;
 }
 
 void AStealthCharacter::Move(const FInputActionValue& Value)
@@ -197,6 +198,9 @@ void AStealthCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 		// Dodge
 		EnhancedInputComponent->BindAction(DodgeRollAction, ETriggerEvent::Started, this, &AStealthCharacter::DodgeRoll);
+
+		// Mantle
+		EnhancedInputComponent->BindAction(MantleAction, ETriggerEvent::Started, this, &AStealthCharacter::TryMantleClimb);
 	}
 	else
 	{
@@ -320,6 +324,41 @@ void AStealthCharacter::MontageHasFinished(UAnimMontage* Montage, bool bInterrup
 	if (Montage == RollMontageToPlay)
 	{
 		bIsDodging = false;
+	}
+}
+
+void AStealthCharacter::TryMantleClimb()
+{
+	// The player should only be able to mantle if on the ground and if they're not already mantling
+	if (!GetCharacterMovement()->IsFalling() && !bIsMantling)
+	{
+		FHitResult HitResult;
+		TArray<AActor*> ActorsToIgnore;
+		ActorsToIgnore.Add(this);
+		
+		for (int32 i = 0; i <= 4; ++i)
+		{
+			FVector StartLoc = GetActorLocation();
+			StartLoc.Z += i * 30.f;
+			FVector EndLoc = (GetActorForwardVector() * 120.f) + StartLoc;
+			// Do a line trace
+			if (!UKismetSystemLibrary::SphereTraceSingle(GetWorld(), StartLoc, EndLoc, 8.f, TraceTypeQuery1, false, ActorsToIgnore, EDrawDebugTrace::ForDuration, HitResult, true))
+			{
+				if (i > 0)
+				{
+					for (int32 j = 0; j <= 4; ++j)
+					{
+						StartLoc = GetActorLocation();
+						StartLoc.X += ((j * 20.f) * GetActorForwardVector().X);
+						StartLoc.Y += (j * 20.f) * GetActorForwardVector().Y;
+						StartLoc.Z += 200.f;
+						EndLoc = (GetActorUpVector() * -200.f) + StartLoc;
+						UKismetSystemLibrary::SphereTraceSingle(GetWorld(), StartLoc, EndLoc, 8.f, TraceTypeQuery1, false, ActorsToIgnore, EDrawDebugTrace::ForDuration, HitResult, true);
+					}
+				}
+				break;
+			}
+		}
 	}
 }
 
