@@ -1,6 +1,5 @@
 // Copyright 2025 DME Games
 
-
 #include "Player/StealthCharacter.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
@@ -70,6 +69,18 @@ AStealthCharacter::AStealthCharacter()
 	if (RollMontage.Succeeded())
 	{
 		RollMontageToPlay = RollMontage.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> MantleMontage1m(TEXT("/Game/Player/Animations/Mantle/Mantling_1M_Montage"));
+	if (MantleMontage1m.Succeeded())
+	{
+		MantleMontageToPlay1m = MantleMontage1m.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> MantleMontage2m(TEXT("/Game/Player/Animations/Mantle/Mantling_2m_Montage"));
+	if (MantleMontage2m.Succeeded())
+	{
+		MantleMontageToPlay2m = MantleMontage2m.Object;
 	}
 
 	static ConstructorHelpers::FClassFinder<UDetectionWidget> DetectionFound(TEXT("/Game/UI/WBP_Detection"));
@@ -154,6 +165,8 @@ void AStealthCharacter::BeginPlay()
 		DetectionWidgetRef = CreateWidget<UDetectionWidget>(UGameplayStatics::GetPlayerController(GetWorld(), 0), DetectionWidgetToDisplay);
 		DetectionWidgetRef->AddToViewport();
 	}
+
+	
 }
 
 // Called every frame
@@ -325,6 +338,17 @@ void AStealthCharacter::MontageHasFinished(UAnimMontage* Montage, bool bInterrup
 	{
 		bIsDodging = false;
 	}
+
+	if (Montage == MantleMontageToPlay1m || Montage == MantleMontageToPlay2m)
+	{
+		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+		bIsMantling = false;
+
+		if (bIsCrouching && CameraTimeline)
+		{
+			CameraTimeline->PlayFromStart();
+		}
+	}
 }
 
 void AStealthCharacter::TryMantleClimb()
@@ -335,8 +359,11 @@ void AStealthCharacter::TryMantleClimb()
 		FHitResult HitResult;
 		TArray<AActor*> ActorsToIgnore;
 		ActorsToIgnore.Add(this);
+
+		// If the player is crouching, check higher up the wall to be able to climb up it
+		int32 NumberOfSteps = bIsCrouching ? 7 : 4;
 		
-		for (int32 i = 0; i <= 4; ++i)
+		for (int32 i = 0; i <= NumberOfSteps; ++i)
 		{
 			FVector StartLoc = GetActorLocation();
 			StartLoc.Z += i * 30.f;
@@ -353,7 +380,46 @@ void AStealthCharacter::TryMantleClimb()
 						StartLoc.Y += (j * 20.f) * GetActorForwardVector().Y;
 						StartLoc.Z += 200.f;
 						EndLoc = (GetActorUpVector() * -200.f) + StartLoc;
-						UKismetSystemLibrary::SphereTraceSingle(GetWorld(), StartLoc, EndLoc, 8.f, TraceTypeQuery1, false, ActorsToIgnore, EDrawDebugTrace::ForDuration, HitResult, true);
+						if (UKismetSystemLibrary::SphereTraceSingle(GetWorld(), StartLoc, EndLoc, 8.f, TraceTypeQuery1, false, ActorsToIgnore, EDrawDebugTrace::ForDuration, HitResult, true))
+						{
+							if (MotionWarpingComp)
+							{
+								FMotionWarpingTarget MotionWarpingTarget;
+								MotionWarpingTarget.Name = FName("Mantle");
+								MotionWarpingTarget.Location = HitResult.Location;
+								MotionWarpingTarget.Location.Z -= 3.0f;
+								MotionWarpingTarget.Rotation = GetActorRotation();
+								MotionWarpingComp->AddOrUpdateWarpTarget(MotionWarpingTarget);
+
+								// Check whether the height of the object to climb is more than 2 metres
+								if (UKismetMathLibrary::Vector_Distance(HitResult.Location, GetActorLocation()) > 200.f)
+								{
+									if (MantleMontageToPlay2m)
+									{
+										PlayAnimMontage(MantleMontageToPlay2m);
+									}
+								}
+								else
+								{
+									if (MantleMontageToPlay1m)
+									{
+										PlayAnimMontage(MantleMontageToPlay1m);
+									}
+								}
+
+								GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+								bIsMantling = true;
+
+								// If crouched, make the player stand
+								if (bIsCrouching)
+								{
+									GetCapsuleComponent()->SetCapsuleHalfHeight(88.f, true);
+									GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -89.f));
+								}
+							}
+							
+							break;
+						}
 					}
 				}
 				break;

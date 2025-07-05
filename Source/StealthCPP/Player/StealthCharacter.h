@@ -50,6 +50,12 @@ protected:
 	TObjectPtr<UAnimMontage> RollMontageToPlay;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player")
+	TObjectPtr<UAnimMontage> MantleMontageToPlay1m;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player")
+	TObjectPtr<UAnimMontage> MantleMontageToPlay2m;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player")
 	TObjectPtr<class UAIPerceptionStimuliSourceComponent> StimuliSourceComponent;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sensors")
