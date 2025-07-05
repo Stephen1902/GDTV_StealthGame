@@ -52,4 +52,6 @@ public:
 
 	UFUNCTION()
 	void ShoutTimerFinished();
+
+	void SetIsDead();
 };

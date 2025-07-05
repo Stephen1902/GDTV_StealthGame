@@ -53,5 +53,5 @@ private:
 	UFUNCTION()
 	virtual void MakeGuardCatch_Implementation() override;
 
-
+	void CanTakeDown_Implementation(FVector& ActorLocation, FRotator& ActorRotation, bool& CanTakeDown, AActor*& IgnoredActor) override;
 };

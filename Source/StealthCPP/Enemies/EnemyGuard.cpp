@@ -92,3 +92,13 @@ void AEnemyGuard::MakeGuardCatch_Implementation()
 	}
 }
 
+void AEnemyGuard::CanTakeDown_Implementation(FVector& ActorLocation, FRotator& ActorRotation, bool& CanTakeDown, AActor*& IgnoredActor)
+{
+	Super::CanTakeDown_Implementation(ActorLocation, ActorRotation, CanTakeDown, IgnoredActor);
+
+	if (AEnemyAIController* EnemyAIController = Cast<AEnemyAIController>(GetController()))
+	{
+		EnemyAIController->SetIsDead();
+	}
+}
+

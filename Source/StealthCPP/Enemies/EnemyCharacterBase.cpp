@@ -2,11 +2,8 @@
 
 
 #include "Enemies/EnemyCharacterBase.h"
-
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
-#include "Perception/AIPerceptionSystem.h"
-#include "Perception/AISense_Sight.h"
 #include "Player/StealthCharacter.h"
 
 // Sets default values
@@ -38,8 +35,7 @@ AEnemyCharacterBase::AEnemyCharacterBase()
 		TakeDownMontage = FoundMontage.Object;
 	}
 
-	bCanBeTakenDown = true;
-		
+	bCanBeTakenDown = true;		
 }
 
 // Called when the game starts or when spawned

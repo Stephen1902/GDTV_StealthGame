@@ -1,20 +1,16 @@
 // Copyright 2025 DME Games
 
 #include "Enemies/EnemyAIController.h"
-
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
-#include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
 #include "SensorsAlarms/Alarm.h"
 
-
 AEnemyAIController::AEnemyAIController()
 {
 	BehaviorTreeComponent = CreateDefaultSubobject<UBehaviorTreeComponent>("Behaviour Tree Comp");
-	//BlackboardComponent = CreateDefaultSubobject<UBlackboardComponent>(TEXT("BlackboardComponent"));
 
 	PerceptionComp = CreateDefaultSubobject<UAIPerceptionComponent>("Perception Comp");
 	SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("Sight Config Comp"));
@@ -33,12 +29,6 @@ AEnemyAIController::AEnemyAIController()
 void AEnemyAIController::BeginPlay()
 {
 	Super::BeginPlay();
-/*
-	if (BlackboardComponent && BehaviorTreeData)
-	{
-		UseBlackboard(BehaviorTreeData, static_cast<UBlackboardComponent*&>(BlackboardComponent));
-	}
-*/
 
 	if (BehaviorTreeComponent && BehaviorTreeToRun)
 	{
@@ -57,20 +47,24 @@ void AEnemyAIController::BeginPlay()
 
 void AEnemyAIController::PerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
 {
-	// Check if what has been sensed is has sight stimulus response
-	if (UAIPerceptionSystem::GetSenseClassForStimulus(GetWorld(), Stimulus) == UAISense_Sight::StaticClass())
+	// Only check for stimulus if the controlled enemy isn't dead
+	if (PerceptionComp)
 	{
-		// Check if the actor sense was successful
-		if (Stimulus.WasSuccessfullySensed())
+		// Check if what has been sensed is has sight stimulus response
+		if (UAIPerceptionSystem::GetSenseClassForStimulus(GetWorld(), Stimulus) == UAISense_Sight::StaticClass())
 		{
-			if (ShoutSoundToPlay && !BehaviorTreeComponent->GetBlackboardComponent()->GetValueAsBool(FName("PlayerSeen")))
+			// Check if the actor sense was successful
+			if (Stimulus.WasSuccessfullySensed())
 			{
-				UGameplayStatics::PlaySoundAtLocation(GetWorld(), ShoutSoundToPlay, GetPerceptionComponent()->GetOwner()->GetActorLocation());
+				if (ShoutSoundToPlay && !BehaviorTreeComponent->GetBlackboardComponent()->GetValueAsBool(FName("PlayerSeen")))
+				{
+					UGameplayStatics::PlaySoundAtLocation(GetWorld(), ShoutSoundToPlay, GetPerceptionComponent()->GetOwner()->GetActorLocation());
+				}
+			
+				BehaviorTreeComponent->GetBlackboardComponent()->SetValueAsBool(FName("PlayerSeen"), true);
+
+				GetWorld()->GetTimerManager().SetTimer(ShoutTimerHandle, this, &AEnemyAIController::ShoutTimerFinished, 0.2f, false, 0.2f);
 			}
-
-			BehaviorTreeComponent->GetBlackboardComponent()->SetValueAsBool(FName("PlayerSeen"), true);
-
-			GetWorld()->GetTimerManager().SetTimer(ShoutTimerHandle, this, &AEnemyAIController::ShoutTimerFinished, 0.2f, false, 0.2f);
 		}
 	}
 }
@@ -87,5 +81,15 @@ void AEnemyAIController::ShoutTimerFinished()
 	if (AAlarm* AlarmActor = Cast<AAlarm>(UGameplayStatics::GetActorOfClass(GetWorld(), AAlarm::StaticClass())))
 	{
 		AlarmActor->StartAlarm();
+	}
+}
+
+void AEnemyAIController::SetIsDead()
+{
+	// The guard is controller controls has been taken down.  We don't need to run the perception component
+	if (PerceptionComp)
+	{
+		PerceptionComp->OnTargetPerceptionUpdated.RemoveDynamic(this, &AEnemyAIController::PerceptionUpdated);
+		PerceptionComp->DestroyComponent();
 	}
 }
