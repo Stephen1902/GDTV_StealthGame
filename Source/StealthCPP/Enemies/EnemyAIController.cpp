@@ -92,4 +92,9 @@ void AEnemyAIController::SetIsDead()
 		PerceptionComp->OnTargetPerceptionUpdated.RemoveDynamic(this, &AEnemyAIController::PerceptionUpdated);
 		PerceptionComp->DestroyComponent();
 	}
+
+	if (BehaviorTreeComponent)
+	{
+		BehaviorTreeComponent->StopTree(EBTStopMode::Safe);
+	}
 }
