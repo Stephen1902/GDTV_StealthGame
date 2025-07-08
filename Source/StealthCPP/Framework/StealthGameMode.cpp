@@ -15,6 +15,12 @@ void AStealthGameMode::BeginPlay()
 		StealthMusicComp = UGameplayStatics::SpawnSound2D(GetWorld(), StealthMusic, 0.5f);
 		StealthMusicComp->FadeIn(0.3f);
 	}
+
+	if (RainSoundEffect)
+	{
+		RainSoundComp = UGameplayStatics::SpawnSound2D(GetWorld(), RainSoundEffect, 1.0f);
+		RainSoundComp->FadeIn(0.3f);		 
+	}
 }
 
 void AStealthGameMode::CreateCapturedWidget()

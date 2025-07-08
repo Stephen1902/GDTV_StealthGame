@@ -25,6 +25,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Game Music")
 	TObjectPtr<USoundBase> EscapeMusic;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Sound Effects")
+	TObjectPtr<USoundBase> RainSoundEffect;
+	
 	// Called at Game Start
 	virtual void BeginPlay() override;
 public:
@@ -41,4 +44,7 @@ private:
 
 	UPROPERTY()
 	UAudioComponent* EscapeMusicComp;
+
+	UPROPERTY()
+	UAudioComponent* RainSoundComp;
 };

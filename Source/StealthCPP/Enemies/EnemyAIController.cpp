@@ -93,6 +93,7 @@ void AEnemyAIController::SetIsDead()
 		PerceptionComp->DestroyComponent();
 	}
 
+	// The behaviour tree also needs turning off
 	if (BehaviorTreeComponent)
 	{
 		BehaviorTreeComponent->StopTree(EBTStopMode::Safe);
