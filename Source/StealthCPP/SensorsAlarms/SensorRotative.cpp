@@ -96,7 +96,6 @@ void ASensorRotative::TimelineRotateReturn(float Val)
 
 void ASensorRotative::EndOfRotation()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Ended"));
 	if (bTimelineForward)
 	{
 		bTimelineForward = false;

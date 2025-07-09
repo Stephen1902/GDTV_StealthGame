@@ -27,11 +27,14 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Sound Effects")
 	TObjectPtr<USoundBase> RainSoundEffect;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Sound Effects")
+	TObjectPtr<USoundBase> CaughtSoundEffect;
 	
 	// Called at Game Start
 	virtual void BeginPlay() override;
 public:
-	void CreateCapturedWidget();
+	void PlayerHasBeenCaught();
 
 	void SwitchToEscapeMusic();
 

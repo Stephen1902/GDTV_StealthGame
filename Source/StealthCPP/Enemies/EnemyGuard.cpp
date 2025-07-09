@@ -65,7 +65,7 @@ void AEnemyGuard::AnimNotify(FName NotifyName, const FBranchingPointNotifyPayloa
 			if (AStealthGameMode* StealthGameMode = Cast<AStealthGameMode>(GetWorld()->GetAuthGameMode()))
 			{
 				bHasAttacked = true;
-				StealthGameMode->CreateCapturedWidget();
+				StealthGameMode->PlayerHasBeenCaught();
 			}
 		}
 	}

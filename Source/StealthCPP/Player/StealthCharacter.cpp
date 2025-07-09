@@ -166,6 +166,11 @@ void AStealthCharacter::BeginPlay()
 		DetectionWidgetRef->AddToViewport();
 	}
 
+	if (APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0))
+	{
+		PC->SetShowMouseCursor(false);
+		PC->SetInputMode(FInputModeGameOnly());
+	}
 	
 }
 
