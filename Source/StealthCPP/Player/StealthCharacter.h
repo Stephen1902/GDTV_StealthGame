@@ -9,6 +9,7 @@
 #include "Framework/GuardInterface.h"
 #include "StealthCharacter.generated.h"
 
+class UPauseMenuWidget;
 class USpringArmComponent;
 class UCameraComponent;
 class UInputMappingContext;
@@ -64,6 +65,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player")
 	TSubclassOf<class UDetectionWidget> DetectionWidgetToDisplay;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player")
+	TSubclassOf<UPauseMenuWidget> PauseMenuWidgetToDisplay;
+
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputMappingContext* DefaultMappingContext;
@@ -93,6 +97,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* MantleAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* PauseMenuAction;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -101,6 +108,9 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	void SetWidgetPercent(float CurrentPercent);
+
+	// Public so can be called from the Pause Menu Widget class;
+	void TogglePauseMenu();
 
 private:
 	UFUNCTION()
@@ -120,6 +130,10 @@ private:
 	UFUNCTION()
 	void TryMantleClimb();
 
+	bool bGameIsPaused;
+	UPROPERTY()
+	TObjectPtr<UPauseMenuWidget> PauseMenuRef;
+	
 	float StandardCameraPos;
 	float CrouchCameraPos;
 	

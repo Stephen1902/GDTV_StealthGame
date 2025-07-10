@@ -27,4 +27,5 @@ void UCapturedWidget::OnRetryButtonClicked()
 
 void UCapturedWidget::OnMainMenuButtonClicked()
 {
+	UGameplayStatics::OpenLevel(GetWorld(), FName("MainMenu"));
 }

@@ -15,6 +15,7 @@
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
 #include "Perception/AISense_Sight.h"
 #include "UI/DetectionWidget.h"
+#include "UI/PauseMenuWidget.h"
 
 // Sets default values
 AStealthCharacter::AStealthCharacter()
@@ -88,12 +89,19 @@ AStealthCharacter::AStealthCharacter()
 	{
 		DetectionWidgetToDisplay = DetectionFound.Class;
 	}
+
+	static ConstructorHelpers::FClassFinder<UPauseMenuWidget> PauseMenuFound(TEXT("/Game/UI/WBP_PauseMenu"));
+	if (PauseMenuFound.Succeeded())
+	{
+		PauseMenuWidgetToDisplay = PauseMenuFound.Class;
+	}
 	
 	Tags.Add(FName("Player"));
 
 	bIsCrouching = false;
 	bIsDodging = false;
 	bIsMantling = false;
+	bGameIsPaused = false;
 }
 
 void AStealthCharacter::Move(const FInputActionValue& Value)
@@ -219,6 +227,9 @@ void AStealthCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 		// Mantle
 		EnhancedInputComponent->BindAction(MantleAction, ETriggerEvent::Started, this, &AStealthCharacter::TryMantleClimb);
+
+		// Pause Menu
+		EnhancedInputComponent->BindAction(PauseMenuAction, ETriggerEvent::Started, this, &AStealthCharacter::TogglePauseMenu);
 	}
 	else
 	{
@@ -429,6 +440,46 @@ void AStealthCharacter::TryMantleClimb()
 				}
 				break;
 			}
+		}
+	}
+}
+
+void AStealthCharacter::TogglePauseMenu()
+{
+	// Get the player controller
+	if (APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0))
+	{
+		// Check if the game is already paused or not
+		if (!bGameIsPaused)
+		{
+			bGameIsPaused = true;
+
+			if (PauseMenuWidgetToDisplay)
+			{
+				// Check if the widget has already been created, but is just hidden, create it if not
+				PauseMenuRef = CreateWidget<UPauseMenuWidget>(PC, PauseMenuWidgetToDisplay);
+				PauseMenuRef->AddToViewport();
+				
+				PC->SetShowMouseCursor(true);
+				FInputModeGameAndUI InputModeUIOnly;
+				InputModeUIOnly.SetWidgetToFocus(PauseMenuRef->TakeWidget());
+				PC->SetInputMode(FInputModeGameAndUI());
+				UGameplayStatics::SetGamePaused(GetWorld(), true);
+			}
+		}
+		else
+		{
+			bGameIsPaused = false;
+
+			if (PauseMenuRef)
+			{
+				PauseMenuRef->RemoveFromParent();
+				PauseMenuRef = nullptr;
+			}
+
+			PC->SetShowMouseCursor(false);
+			PC->SetInputMode(FInputModeGameOnly());
+			UGameplayStatics::SetGamePaused(GetWorld(), false);
 		}
 	}
 }
