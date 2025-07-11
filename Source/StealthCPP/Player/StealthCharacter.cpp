@@ -16,6 +16,7 @@
 #include "Perception/AISense_Sight.h"
 #include "UI/DetectionWidget.h"
 #include "UI/PauseMenuWidget.h"
+#include "UI/TimerWidget.h"
 
 // Sets default values
 AStealthCharacter::AStealthCharacter()
@@ -95,7 +96,13 @@ AStealthCharacter::AStealthCharacter()
 	{
 		PauseMenuWidgetToDisplay = PauseMenuFound.Class;
 	}
-	
+
+	static ConstructorHelpers::FClassFinder<UTimerWidget> TimerMenuFound(TEXT("/Game/UI/WBP_Timer"));
+	if (TimerMenuFound.Succeeded())
+	{
+		TimerWidgetToDisplay = TimerMenuFound.Class;
+	}
+
 	Tags.Add(FName("Player"));
 
 	bIsCrouching = false;
@@ -172,6 +179,12 @@ void AStealthCharacter::BeginPlay()
 	{
 		DetectionWidgetRef = CreateWidget<UDetectionWidget>(UGameplayStatics::GetPlayerController(GetWorld(), 0), DetectionWidgetToDisplay);
 		DetectionWidgetRef->AddToViewport();
+	}
+
+	if (TimerWidgetToDisplay)
+	{
+		UTimerWidget* TimerWidget = CreateWidget<UTimerWidget>(UGameplayStatics::GetPlayerController(GetWorld(), 0), TimerWidgetToDisplay);
+		TimerWidget->AddToViewport();
 	}
 
 	if (APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0))
