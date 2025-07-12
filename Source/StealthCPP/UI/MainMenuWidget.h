@@ -29,6 +29,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Main Menu UI", meta=(BindWidget))
 	UButton* BTN_Exit;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Main Menu UI", meta=(BindWidget))
+	class UScrollBox* SB_Leaderboard;
+
 private:
 	UFUNCTION()
 	void OnPlayButtonClicked();
