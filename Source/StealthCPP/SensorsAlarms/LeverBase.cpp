@@ -43,10 +43,7 @@ ALeverBase::ALeverBase()
 void ALeverBase::BeginPlay()
 {
 	Super::BeginPlay();
-
 	
-	
-
 }
 
 // Called every frame

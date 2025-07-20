@@ -27,6 +27,9 @@ AStealthCharacter::AStealthCharacter()
 	// Set Default location and rotation for the mesh so it display correctly in the BP
 	GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -89.f));
 	GetMesh()->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
+	
+	JewelMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Jewel Mesh"));
+	JewelMeshComp->SetupAttachment(GetRootComponent());
 
 	// Create the Spring Arm Component and attach it to the Capsule
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>("Spring Arm");
@@ -109,6 +112,7 @@ AStealthCharacter::AStealthCharacter()
 	bIsDodging = false;
 	bIsMantling = false;
 	bGameIsPaused = false;
+	bHasJewel = false;
 }
 
 void AStealthCharacter::Move(const FInputActionValue& Value)
@@ -265,7 +269,6 @@ void AStealthCharacter::TryToInteract()
 
 	if (OverlappingActors.Num() > 0)
 	{
-		
 		for (AActor* It : OverlappingActors)
 		{
 			if (It->Implements<UInteractInterface>())
@@ -298,9 +301,7 @@ void AStealthCharacter::TryToInteract()
 							GetCapsuleComponent()->IgnoreActorWhenMoving(ActorToIgnore, true);
 							GetMesh()->IgnoreActorWhenMoving(ActorToIgnore, true);
 						}
-						
 					}
-					
 				}
 			}
 		}
@@ -494,6 +495,19 @@ void AStealthCharacter::TogglePauseMenu()
 			PC->SetInputMode(FInputModeGameOnly());
 			UGameplayStatics::SetGamePaused(GetWorld(), false);
 		}
+	}
+}
+
+void AStealthCharacter::EquipJewel(UStaticMesh* MeshToAttach, FVector MeshScale)
+{
+	if (!bHasJewel && MeshToAttach)
+	{
+		bHasJewel = true;
+		
+		JewelMeshComp->SetStaticMesh(MeshToAttach);
+		FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
+		JewelMeshComp->AttachToComponent(GetMesh(), AttachmentRules, FName("hand_r"));
+		JewelMeshComp->SetRelativeScale3D(MeshScale);
 	}
 }
 

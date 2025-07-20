@@ -73,7 +73,6 @@ void ASensorBase::DetectPlayer(AActor* ActorDetected)
 
 		if (FlashTimeline)
 		{
-			
 			FlashTimeline->Play();
 		}
 	}

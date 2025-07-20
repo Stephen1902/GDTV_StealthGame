@@ -39,6 +39,9 @@ protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player")
+	TObjectPtr<UStaticMeshComponent> JewelMeshComp;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player")
 	TObjectPtr<USpringArmComponent> SpringArmComp;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player")
@@ -62,6 +65,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sensors")
 	UCurveFloat* FloatCurve;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player")
+	TObjectPtr<UStaticMesh> JewelMesh;
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player")
 	TSubclassOf<class UDetectionWidget> DetectionWidgetToDisplay;
 
@@ -115,6 +121,8 @@ public:
 	// Public so can be called from the Pause Menu Widget class;
 	void TogglePauseMenu();
 
+	// Called when the player overlaps the jewel
+	void EquipJewel(UStaticMesh* MeshToAttach, FVector MeshScale);
 private:
 	UFUNCTION()
 	void TryToInteract();
@@ -154,4 +162,6 @@ private:
 	TObjectPtr<class UMotionWarpingComponent> MotionWarpingComp;
 
 	TObjectPtr<UDetectionWidget> DetectionWidgetRef;
+
+	bool bHasJewel;
 };

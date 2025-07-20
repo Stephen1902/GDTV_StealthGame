@@ -1,8 +1,6 @@
 // Copyright 2025 DME Games
 
-
 #include "Framework/EscapeActor.h"
-
 #include "Blueprint/UserWidget.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
