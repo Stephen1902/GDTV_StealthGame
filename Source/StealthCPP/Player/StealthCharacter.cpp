@@ -187,8 +187,8 @@ void AStealthCharacter::BeginPlay()
 
 	if (TimerWidgetToDisplay)
 	{
-		UTimerWidget* TimerWidget = CreateWidget<UTimerWidget>(UGameplayStatics::GetPlayerController(GetWorld(), 0), TimerWidgetToDisplay);
-		TimerWidget->AddToViewport();
+		TimerWidgetRef = CreateWidget<UTimerWidget>(UGameplayStatics::GetPlayerController(GetWorld(), 0), TimerWidgetToDisplay);
+		TimerWidgetRef->AddToViewport();
 	}
 
 	if (APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0))

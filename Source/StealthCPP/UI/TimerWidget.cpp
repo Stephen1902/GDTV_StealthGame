@@ -1,8 +1,13 @@
 // Copyright 2025 DME Games
 
 #include "UI/TimerWidget.h"
-
 #include "Components/TextBlock.h"
+
+FText UTimerWidget::GetCurrentTime() const
+{
+	FString StringToDisplay = AppendInteger(Minutes) + " : " + AppendInteger(Seconds); 
+	return(FText::FromString(*StringToDisplay));
+}
 
 void UTimerWidget::NativeConstruct()
 {

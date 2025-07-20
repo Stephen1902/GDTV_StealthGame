@@ -4,7 +4,10 @@
 #include "Blueprint/UserWidget.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Player/PlayerHighScores.h"
+#include "Player/StealthCharacter.h"
 #include "UI/EscapedWidget.h"
+#include "UI/TimerWidget.h"
 
 // Sets default values
 AEscapeActor::AEscapeActor()
@@ -37,7 +40,7 @@ void AEscapeActor::BeginPlay()
 void AEscapeActor::OnCollisionBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	// Check if what has overlapped is the player
-	if (OtherActor->ActorHasTag(FName("Player")))
+	if (AStealthCharacter* PlayerCharacter = Cast<AStealthCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)))
 	{
 		if (EscapedWidgetToShow)
 		{
@@ -53,5 +56,20 @@ void AEscapeActor::OnCollisionBegin(UPrimitiveComponent* OverlappedComponent, AA
 				PC->SetInputMode(InputModeGameAndUI);
 			}
 		}
+
+		// The save slot should have been created already.  If it doesn't, there is a problem in the MainMenuWidget class
+		if (UGameplayStatics::DoesSaveGameExist("PlayerSavedTimes", 0))
+		{
+			// Load the existing save
+			UPlayerHighScores* PlayerHighScores = Cast<UPlayerHighScores>(UGameplayStatics::LoadGameFromSlot("PlayerSavedTimes", 0));
+			// Add the player time to the saved game array
+			PlayerHighScores->SetNewScore(PlayerCharacter->GetTimerWidget()->GetCurrentTime());
+			// Save the game
+			const bool bSaved = UGameplayStatics::SaveGameToSlot(PlayerHighScores, "PlayerSavedTimes", 0);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Tried to save game in Escape Actor, but the save slot doesn't exist."));
+		}	
 	}
 }

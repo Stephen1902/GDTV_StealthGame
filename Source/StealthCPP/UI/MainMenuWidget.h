@@ -32,7 +32,10 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Main Menu UI", meta=(BindWidget))
 	class UScrollBox* SB_Leaderboard;
 
-private:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Main Menu UI")
+	TSubclassOf<class ULeaderboardWidget> LeaderboardWidgetToDisplay;
+
+private:	
 	UFUNCTION()
 	void OnPlayButtonClicked();
 

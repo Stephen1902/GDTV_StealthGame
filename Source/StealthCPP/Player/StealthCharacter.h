@@ -10,6 +10,7 @@
 #include "StealthCharacter.generated.h"
 
 class UPauseMenuWidget;
+class UTimerWidget;
 class USpringArmComponent;
 class UCameraComponent;
 class UInputMappingContext;
@@ -27,7 +28,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Player")
 	bool GetPlayerCrouching() const	{ return bIsCrouching; }
-
+	
+	UTimerWidget* GetTimerWidget() const { return TimerWidgetRef;}
 protected:
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
@@ -75,7 +77,7 @@ protected:
 	TSubclassOf<UPauseMenuWidget> PauseMenuWidgetToDisplay;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player")
-	TSubclassOf<class UTimerWidget> TimerWidgetToDisplay;
+	TSubclassOf<UTimerWidget> TimerWidgetToDisplay;
 	
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
@@ -162,6 +164,7 @@ private:
 	TObjectPtr<class UMotionWarpingComponent> MotionWarpingComp;
 
 	TObjectPtr<UDetectionWidget> DetectionWidgetRef;
+	TObjectPtr<UTimerWidget> TimerWidgetRef;
 
 	bool bHasJewel;
 };

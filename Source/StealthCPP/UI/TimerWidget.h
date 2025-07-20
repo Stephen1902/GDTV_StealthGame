@@ -14,6 +14,8 @@ class STEALTHCPP_API UTimerWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
+public:
+	FText GetCurrentTime() const;
 protected:
 	virtual void NativeConstruct() override;
 	
